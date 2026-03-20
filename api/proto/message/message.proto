@@ -1,0 +1,141 @@
+syntax = "proto3";
+
+package message;
+
+option go_package = "github.com/effect707/MessngerGrusha/api/gen/message";
+
+import "google/api/annotations.proto";
+
+service MessageService {
+  rpc SendMessage(SendMessageRequest) returns (SendMessageResponse) {
+    option (google.api.http) = {
+      post: "/api/messages/send"
+      body: "*"
+    };
+  }
+  rpc GetHistory(GetHistoryRequest) returns (GetHistoryResponse) {
+    option (google.api.http) = {
+      get: "/api/messages/history"
+    };
+  }
+  rpc SearchMessages(SearchMessagesRequest) returns (SearchMessagesResponse) {
+    option (google.api.http) = {
+      get: "/api/messages/search"
+    };
+  }
+  rpc AddReaction(AddReactionRequest) returns (AddReactionResponse) {
+    option (google.api.http) = {
+      post: "/api/messages/{message_id}/reactions"
+      body: "*"
+    };
+  }
+  rpc RemoveReaction(RemoveReactionRequest) returns (RemoveReactionResponse) {
+    option (google.api.http) = {
+      delete: "/api/messages/{message_id}/reactions"
+    };
+  }
+  rpc GetReactions(GetReactionsRequest) returns (GetReactionsResponse) {
+    option (google.api.http) = {
+      get: "/api/messages/{message_id}/reactions"
+    };
+  }
+  rpc GetAttachments(GetAttachmentsRequest) returns (GetAttachmentsResponse) {
+    option (google.api.http) = {
+      get: "/api/messages/{message_id}/attachments"
+    };
+  }
+}
+
+message SendMessageRequest {
+  string chat_id = 1;
+  string type = 2;
+  string content = 3;
+  optional string reply_to_id = 4;
+}
+
+message SendMessageResponse {
+  Message message = 1;
+}
+
+message GetHistoryRequest {
+  string chat_id = 1;
+  int32 limit = 2;
+  optional string cursor_id = 3;
+  optional string cursor_created_at = 4;
+}
+
+message GetHistoryResponse {
+  repeated Message messages = 1;
+  bool has_more = 2;
+  optional string next_cursor_id = 3;
+  optional string next_cursor_created_at = 4;
+}
+
+message SearchMessagesRequest {
+  string chat_id = 1;
+  string query = 2;
+  int32 limit = 3;
+}
+
+message SearchMessagesResponse {
+  repeated Message messages = 1;
+}
+
+message AddReactionRequest {
+  string message_id = 1;
+  string emoji = 2;
+}
+
+message AddReactionResponse {}
+
+message RemoveReactionRequest {
+  string message_id = 1;
+  string emoji = 2;
+}
+
+message RemoveReactionResponse {}
+
+message GetReactionsRequest {
+  string message_id = 1;
+}
+
+message GetReactionsResponse {
+  repeated Reaction reactions = 1;
+}
+
+message GetAttachmentsRequest {
+  string message_id = 1;
+}
+
+message GetAttachmentsResponse {
+  repeated Attachment attachments = 1;
+}
+
+message Message {
+  string id = 1;
+  string chat_id = 2;
+  string sender_id = 3;
+  string type = 4;
+  string content = 5;
+  optional string reply_to_id = 6;
+  bool is_edited = 7;
+  string created_at = 8;
+  string updated_at = 9;
+}
+
+message Reaction {
+  string message_id = 1;
+  string user_id = 2;
+  string emoji = 3;
+  string created_at = 4;
+}
+
+message Attachment {
+  string id = 1;
+  string message_id = 2;
+  string file_name = 3;
+  int64 file_size = 4;
+  string mime_type = 5;
+  optional int32 duration_ms = 6;
+  string created_at = 7;
+}

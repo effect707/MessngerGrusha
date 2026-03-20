@@ -1,0 +1,125 @@
+syntax = "proto3";
+
+package channel;
+
+option go_package = "github.com/effect707/MessngerGrusha/api/gen/channel";
+
+import "google/api/annotations.proto";
+
+service ChannelService {
+  rpc CreateChannel(CreateChannelRequest) returns (CreateChannelResponse) {
+    option (google.api.http) = {
+      post: "/api/channels"
+      body: "*"
+    };
+  }
+  rpc GetChannel(GetChannelRequest) returns (GetChannelResponse) {
+    option (google.api.http) = {
+      get: "/api/channels/{channel_id}"
+    };
+  }
+  rpc UpdateChannel(UpdateChannelRequest) returns (UpdateChannelResponse) {
+    option (google.api.http) = {
+      put: "/api/channels/{channel_id}"
+      body: "*"
+    };
+  }
+  rpc DeleteChannel(DeleteChannelRequest) returns (DeleteChannelResponse) {
+    option (google.api.http) = {
+      delete: "/api/channels/{channel_id}"
+    };
+  }
+  rpc Subscribe(SubscribeRequest) returns (SubscribeResponse) {
+    option (google.api.http) = {
+      post: "/api/channels/{channel_id}/subscribe"
+    };
+  }
+  rpc Unsubscribe(UnsubscribeRequest) returns (UnsubscribeResponse) {
+    option (google.api.http) = {
+      delete: "/api/channels/{channel_id}/subscribe"
+    };
+  }
+  rpc GetPublicChannels(GetPublicChannelsRequest) returns (GetPublicChannelsResponse) {
+    option (google.api.http) = {
+      get: "/api/channels/public"
+    };
+  }
+  rpc GetMyChannels(GetMyChannelsRequest) returns (GetMyChannelsResponse) {
+    option (google.api.http) = {
+      get: "/api/channels/mine"
+    };
+  }
+}
+
+message CreateChannelRequest {
+  string slug = 1;
+  string name = 2;
+  string description = 3;
+  bool is_private = 4;
+}
+
+message CreateChannelResponse {
+  Channel channel = 1;
+}
+
+message GetChannelRequest {
+  string channel_id = 1;
+}
+
+message GetChannelResponse {
+  Channel channel = 1;
+}
+
+message UpdateChannelRequest {
+  string channel_id = 1;
+  string name = 2;
+  string description = 3;
+  bool is_private = 4;
+}
+
+message UpdateChannelResponse {
+  Channel channel = 1;
+}
+
+message DeleteChannelRequest {
+  string channel_id = 1;
+}
+
+message DeleteChannelResponse {}
+
+message SubscribeRequest {
+  string channel_id = 1;
+}
+
+message SubscribeResponse {}
+
+message UnsubscribeRequest {
+  string channel_id = 1;
+}
+
+message UnsubscribeResponse {}
+
+message GetPublicChannelsRequest {
+  int32 limit = 1;
+}
+
+message GetPublicChannelsResponse {
+  repeated Channel channels = 1;
+}
+
+message GetMyChannelsRequest {}
+
+message GetMyChannelsResponse {
+  repeated Channel channels = 1;
+}
+
+message Channel {
+  string id = 1;
+  string slug = 2;
+  string name = 3;
+  string description = 4;
+  string avatar_url = 5;
+  string owner_id = 6;
+  bool is_private = 7;
+  string created_at = 8;
+}

@@ -1,0 +1,97 @@
+syntax = "proto3";
+
+package chat;
+
+option go_package = "github.com/effect707/MessngerGrusha/api/gen/chat";
+
+import "google/api/annotations.proto";
+
+service ChatService {
+  rpc CreateDirectChat(CreateDirectChatRequest) returns (CreateDirectChatResponse) {
+    option (google.api.http) = {
+      post: "/api/chats/direct"
+      body: "*"
+    };
+  }
+  rpc CreateGroupChat(CreateGroupChatRequest) returns (CreateGroupChatResponse) {
+    option (google.api.http) = {
+      post: "/api/chats/group"
+      body: "*"
+    };
+  }
+  rpc GetChat(GetChatRequest) returns (GetChatResponse) {
+    option (google.api.http) = {
+      get: "/api/chats/{chat_id}"
+    };
+  }
+  rpc GetUserChats(GetUserChatsRequest) returns (GetUserChatsResponse) {
+    option (google.api.http) = {
+      get: "/api/chats/mine"
+    };
+  }
+  rpc AddMember(AddMemberRequest) returns (AddMemberResponse) {
+    option (google.api.http) = {
+      post: "/api/chats/{chat_id}/members"
+      body: "*"
+    };
+  }
+  rpc RemoveMember(RemoveMemberRequest) returns (RemoveMemberResponse) {
+    option (google.api.http) = {
+      delete: "/api/chats/{chat_id}/members/{user_id}"
+    };
+  }
+}
+
+message CreateDirectChatRequest {
+  string recipient_id = 1;
+}
+
+message CreateDirectChatResponse {
+  Chat chat = 1;
+}
+
+message CreateGroupChatRequest {
+  string name = 1;
+  repeated string member_ids = 2;
+}
+
+message CreateGroupChatResponse {
+  Chat chat = 1;
+}
+
+message GetChatRequest {
+  string chat_id = 1;
+}
+
+message GetChatResponse {
+  Chat chat = 1;
+}
+
+message GetUserChatsRequest {}
+
+message GetUserChatsResponse {
+  repeated Chat chats = 1;
+}
+
+message AddMemberRequest {
+  string chat_id = 1;
+  string user_id = 2;
+}
+
+message AddMemberResponse {}
+
+message RemoveMemberRequest {
+  string chat_id = 1;
+  string user_id = 2;
+}
+
+message RemoveMemberResponse {}
+
+message Chat {
+  string id = 1;
+  string type = 2;
+  string name = 3;
+  string avatar_url = 4;
+  string created_by = 5;
+  string created_at = 6;
+}

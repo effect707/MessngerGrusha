@@ -14,7 +14,7 @@ interface AuthState {
 }
 
 export const useAuthStore = create<AuthState>((set, get) => {
-  // Wire up the API client callbacks
+
   setAuthCallbacks(
     () => get().accessToken,
     () => {

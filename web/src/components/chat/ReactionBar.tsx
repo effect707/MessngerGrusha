@@ -10,7 +10,6 @@ interface Props {
 export function ReactionBar({ reactions, currentUserId, onToggle }: Props) {
   if (reactions.length === 0) return null
 
-  // Group reactions by emoji
   const grouped = reactions.reduce<Record<string, { count: number; mine: boolean }>>((acc, r) => {
     if (!acc[r.emoji]) acc[r.emoji] = { count: 0, mine: false }
     acc[r.emoji].count++

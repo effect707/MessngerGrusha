@@ -30,7 +30,7 @@ export class GrushaSocket {
           handlers.forEach((h) => h(msg.payload))
         }
       } catch {
-        // ignore malformed messages
+
       }
     }
 

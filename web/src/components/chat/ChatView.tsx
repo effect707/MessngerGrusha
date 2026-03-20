@@ -1,5 +1,8 @@
 import { useRef, useCallback } from 'react'
 import { useChatStore } from '../../store/chatStore'
+import { useAuthStore } from '../../store/authStore'
+import { messagesApi } from '../../api/messages'
+import { filesApi } from '../../api/files'
 import { ChatHeader } from './ChatHeader'
 import { MessageList } from './MessageList'
 import { MessageInput } from './MessageInput'
@@ -34,9 +37,18 @@ export function ChatView({ socketRef }: Props) {
     }, 2000)
   }, [activeChatId, socketRef])
 
-  const handleFileSelect = useCallback((_file: File) => {
-    // TODO: implement file upload flow
-  }, [])
+  const handleFileSelect = useCallback(async (file: File) => {
+    if (!activeChatId) return
+    try {
+      const res = await messagesApi.send(activeChatId, 'file', file.name)
+      const token = useAuthStore.getState().accessToken
+      if (res.message?.id && token) {
+        await filesApi.upload(res.message.id, file, undefined, token)
+      }
+    } catch (err) {
+      console.error('File upload failed:', err)
+    }
+  }, [activeChatId])
 
   if (!activeChatId || !chat) {
     return (

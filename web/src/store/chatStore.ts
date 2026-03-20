@@ -26,13 +26,25 @@ export const useChatStore = create<ChatState>((set) => ({
 
   async createDirect(recipientId) {
     const res = await chatsApi.createDirect(recipientId)
-    set((s) => ({ chats: [res.chat, ...s.chats], activeChatId: res.chat.id }))
+    set((s) => {
+      const exists = s.chats.some((c) => c.id === res.chat.id)
+      return {
+        chats: exists ? s.chats : [res.chat, ...s.chats],
+        activeChatId: res.chat.id,
+      }
+    })
     return res.chat
   },
 
   async createGroup(name, memberIds) {
     const res = await chatsApi.createGroup(name, memberIds)
-    set((s) => ({ chats: [res.chat, ...s.chats], activeChatId: res.chat.id }))
+    set((s) => {
+      const exists = s.chats.some((c) => c.id === res.chat.id)
+      return {
+        chats: exists ? s.chats : [res.chat, ...s.chats],
+        activeChatId: res.chat.id,
+      }
+    })
     return res.chat
   },
 }))

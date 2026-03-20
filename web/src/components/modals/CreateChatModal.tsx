@@ -1,22 +1,29 @@
 import { useState } from 'react'
 import { useChatStore } from '../../store/chatStore'
 import { useUIStore } from '../../store/uiStore'
+import { usersApi } from '../../api/users'
 import styles from './CreateChatModal.module.css'
 
 export function CreateChatModal() {
-  const [recipientId, setRecipientId] = useState('')
+  const [username, setUsername] = useState('')
   const [error, setError] = useState('')
+  const [loading, setLoading] = useState(false)
   const createDirect = useChatStore((s) => s.createDirect)
   const closeModal = useUIStore((s) => s.closeModal)
 
   async function handleCreate() {
-    if (!recipientId.trim()) return
+    if (!username.trim()) return
     setError('')
+    setLoading(true)
     try {
-      await createDirect(recipientId.trim())
+
+      const res = await usersApi.getProfile(username.trim())
+      await createDirect(res.user.id)
       closeModal()
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Error')
+      setError(err instanceof Error ? err.message : 'Пользователь не найден')
+    } finally {
+      setLoading(false)
     }
   }
 
@@ -27,13 +34,15 @@ export function CreateChatModal() {
         {error && <div className={styles.error}>{error}</div>}
         <input
           className={styles.input}
-          placeholder="ID пользователя"
-          value={recipientId}
-          onChange={(e) => setRecipientId(e.target.value)}
+          placeholder="Логин собеседника (например: vasya)"
+          value={username}
+          onChange={(e) => setUsername(e.target.value)}
         />
         <div className={styles.buttons}>
           <button className={styles.btnSecondary} onClick={closeModal}>Отмена</button>
-          <button className={styles.btnPrimary} onClick={handleCreate}>Создать</button>
+          <button className={styles.btnPrimary} onClick={handleCreate} disabled={loading}>
+            {loading ? 'Поиск...' : 'Создать'}
+          </button>
         </div>
       </div>
     </div>

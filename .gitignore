@@ -33,6 +33,7 @@ web/dist/
 
 # Superpowers
 .superpowers/
+docs/superpowers/
 
 # Generated (uncomment if you prefer to not commit generated code)
 # api/gen/

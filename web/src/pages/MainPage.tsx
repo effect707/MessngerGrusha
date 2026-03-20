@@ -24,7 +24,6 @@ export function MainPage() {
   const activeModal = useUIStore((s) => s.activeModal)
   const accessToken = useAuthStore((s) => s.accessToken)
 
-  // Fetch user profile on mount
   useEffect(() => {
     const state = useAuthStore.getState()
     if (state.accessToken && !state.user) {
@@ -35,7 +34,7 @@ export function MainPage() {
             useAuthStore.setState({ user: res.user })
           })
         }
-      } catch { /* ignore */ }
+      } catch {  }
     }
   }, [accessToken])
 

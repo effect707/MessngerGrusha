@@ -16,6 +16,7 @@ import (
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
+	"google.golang.org/protobuf/encoding/protojson"
 
 	pb_auth "github.com/effect707/MessngerGrusha/api/gen/auth"
 	pb_channel "github.com/effect707/MessngerGrusha/api/gen/channel"
@@ -54,7 +55,6 @@ func New(cfg *config.Config) (*App, error) {
 		Level: slog.LevelInfo,
 	}))
 
-	// PostgreSQL
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
@@ -68,7 +68,6 @@ func New(cfg *config.Config) (*App, error) {
 	}
 	logger.Info("connected to PostgreSQL")
 
-	// Redis
 	redisClient := goredis.NewClient(&goredis.Options{
 		Addr:     cfg.Redis.Addr,
 		Password: cfg.Redis.Password,
@@ -80,7 +79,6 @@ func New(cfg *config.Config) (*App, error) {
 	}
 	logger.Info("connected to Redis")
 
-	// MinIO
 	fileStorage, err := miniorepo.NewFileStorage(
 		cfg.MinIO.Endpoint,
 		cfg.MinIO.AccessKey,
@@ -97,7 +95,6 @@ func New(cfg *config.Config) (*App, error) {
 	}
 	logger.Info("connected to MinIO")
 
-	// Repositories
 	userRepo := postgres.NewUserRepository(pool)
 	tokenRepo := postgres.NewTokenRepository(pool)
 	sessionRepo := redisrepo.NewSessionRepository(redisClient)
@@ -110,7 +107,6 @@ func New(cfg *config.Config) (*App, error) {
 	channelRepo := postgres.NewChannelRepository(pool)
 	notifRepo := postgres.NewNotificationRepository(pool)
 
-	// Services
 	tokenManager := jwtpkg.NewTokenManager(
 		cfg.JWT.Secret,
 		cfg.JWT.AccessTokenTTL,
@@ -118,7 +114,6 @@ func New(cfg *config.Config) (*App, error) {
 	)
 	passwordHasher := hasher.NewBcryptHasher()
 
-	// UseCases
 	authUseCase := authuc.NewUseCase(userRepo, tokenRepo, sessionRepo, passwordHasher, tokenManager)
 	chatUseCase := chatuc.NewUseCase(chatRepo, userRepo)
 	fileUseCase := fileuc.NewUseCase(fileStorage, attachmentRepo, msgRepo, chatRepo)
@@ -131,7 +126,6 @@ func New(cfg *config.Config) (*App, error) {
 	broker := ws.NewLocalBroker(hub)
 	msgUseCase := msguc.NewUseCase(msgRepo, chatRepo, broker)
 
-	// gRPC Server
 	grpcServer := grpc.NewServer(
 		grpc.ChainUnaryInterceptor(
 			grpcinterceptor.LoggingUnaryInterceptor(logger),
@@ -139,7 +133,6 @@ func New(cfg *config.Config) (*App, error) {
 		),
 	)
 
-	// Register gRPC services
 	authHandler := grpctransport.NewAuthHandler(authUseCase)
 	pb_auth.RegisterAuthServiceServer(grpcServer, authHandler)
 
@@ -155,36 +148,40 @@ func New(cfg *config.Config) (*App, error) {
 	channelHandler := grpctransport.NewChannelHandler(channelUseCase)
 	pb_channel.RegisterChannelServiceServer(grpcServer, channelHandler)
 
-	// WebSocket
 	wsServer := ws.NewServer(hub, tokenManager, logger)
 	wsHandler := ws.NewWSHandler(hub, msgUseCase, typingRepo, chatRepo, logger)
 	wsServer.SetHandler(wsHandler.HandleMessage)
 
-	// HTTP
 	fileHandler := httptransport.NewFileHandler(fileUseCase, tokenManager, logger)
 
 	mux := http.NewServeMux()
 	mux.Handle("/ws", wsServer)
 	mux.HandleFunc("/api/files/upload", fileHandler.Upload)
 	mux.HandleFunc("/api/files/download", fileHandler.Download)
-	// grpc-gateway
+
 	grpcAddr := fmt.Sprintf("localhost:%d", cfg.GRPC.Port)
-	gwMux := runtime.NewServeMux()
+	gwMux := runtime.NewServeMux(
+		runtime.WithMarshalerOption(runtime.MIMEWildcard, &runtime.JSONPb{
+			MarshalOptions:   protojson.MarshalOptions{UseProtoNames: true},
+			UnmarshalOptions: protojson.UnmarshalOptions{DiscardUnknown: true},
+		}),
+	)
 	gwOpts := []grpc.DialOption{grpc.WithTransportCredentials(insecure.NewCredentials())}
 
-	if err := pb_auth.RegisterAuthServiceHandlerFromEndpoint(ctx, gwMux, grpcAddr, gwOpts); err != nil {
+	gwCtx := context.Background()
+	if err := pb_auth.RegisterAuthServiceHandlerFromEndpoint(gwCtx, gwMux, grpcAddr, gwOpts); err != nil {
 		return nil, fmt.Errorf("register auth gateway: %w", err)
 	}
-	if err := pb_chat.RegisterChatServiceHandlerFromEndpoint(ctx, gwMux, grpcAddr, gwOpts); err != nil {
+	if err := pb_chat.RegisterChatServiceHandlerFromEndpoint(gwCtx, gwMux, grpcAddr, gwOpts); err != nil {
 		return nil, fmt.Errorf("register chat gateway: %w", err)
 	}
-	if err := pb_msg.RegisterMessageServiceHandlerFromEndpoint(ctx, gwMux, grpcAddr, gwOpts); err != nil {
+	if err := pb_msg.RegisterMessageServiceHandlerFromEndpoint(gwCtx, gwMux, grpcAddr, gwOpts); err != nil {
 		return nil, fmt.Errorf("register message gateway: %w", err)
 	}
-	if err := pb_channel.RegisterChannelServiceHandlerFromEndpoint(ctx, gwMux, grpcAddr, gwOpts); err != nil {
+	if err := pb_channel.RegisterChannelServiceHandlerFromEndpoint(gwCtx, gwMux, grpcAddr, gwOpts); err != nil {
 		return nil, fmt.Errorf("register channel gateway: %w", err)
 	}
-	if err := pb_user.RegisterUserServiceHandlerFromEndpoint(ctx, gwMux, grpcAddr, gwOpts); err != nil {
+	if err := pb_user.RegisterUserServiceHandlerFromEndpoint(gwCtx, gwMux, grpcAddr, gwOpts); err != nil {
 		return nil, fmt.Errorf("register user gateway: %w", err)
 	}
 

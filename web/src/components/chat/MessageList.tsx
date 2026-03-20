@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { useEffect, useMemo } from 'react'
 import { useMessageStore } from '../../store/messageStore'
 import { useAuthStore } from '../../store/authStore'
 import { useInfiniteScroll } from '../../hooks/useInfiniteScroll'
@@ -6,22 +6,25 @@ import { MessageBubble } from './MessageBubble'
 import { TypingIndicator } from './TypingIndicator'
 import styles from './MessageList.module.css'
 
+const EMPTY: string[] = []
+
 interface Props {
   chatId: string
 }
 
 export function MessageList({ chatId }: Props) {
-  const messages = useMessageStore((s) => s.messages[chatId] || [])
-  const hasMore = useMessageStore((s) => s.hasMore[chatId] ?? true)
-  const typing = useMessageStore((s) => s.typing[chatId] || [])
+  const messagesMap = useMessageStore((s) => s.messages)
+  const hasMoreMap = useMessageStore((s) => s.hasMore)
+  const typingMap = useMessageStore((s) => s.typing)
   const fetchHistory = useMessageStore((s) => s.fetchHistory)
+  const messages = useMemo(() => messagesMap[chatId] || [], [messagesMap, chatId])
+  const hasMore = hasMoreMap[chatId] ?? true
+  const typing = typingMap[chatId] || EMPTY
   const user = useAuthStore((s) => s.user)
 
   useEffect(() => {
-    if (messages.length === 0) {
-      fetchHistory(chatId)
-    }
-  }, [chatId, messages.length, fetchHistory])
+    fetchHistory(chatId)
+  }, [chatId, fetchHistory])
 
   const { containerRef, handleScroll } = useInfiniteScroll(
     () => fetchHistory(chatId),

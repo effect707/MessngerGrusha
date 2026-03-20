@@ -1,0 +1,82 @@
+.container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  background: var(--bg-primary);
+}
+
+.form {
+  width: 360px;
+  padding: 40px;
+  background: var(--bg-secondary);
+  border-radius: 12px;
+}
+
+.logo {
+  text-align: center;
+  font-size: 32px;
+  margin-bottom: 8px;
+}
+
+.title {
+  text-align: center;
+  font-size: 20px;
+  font-weight: 500;
+  margin-bottom: 24px;
+  color: var(--text-primary);
+}
+
+.input {
+  width: 100%;
+  padding: 12px 16px;
+  margin-bottom: 12px;
+  background: var(--bg-input);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--text-primary);
+  font-size: 14px;
+  outline: none;
+}
+
+.input:focus {
+  border-color: var(--accent);
+}
+
+.button {
+  width: 100%;
+  padding: 12px;
+  margin-top: 8px;
+  background: var(--accent);
+  color: var(--text-primary);
+  border: none;
+  border-radius: 8px;
+  font-size: 15px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.button:hover {
+  opacity: 0.9;
+}
+
+.button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.link {
+  display: block;
+  text-align: center;
+  margin-top: 16px;
+  color: var(--accent);
+  font-size: 14px;
+  text-decoration: none;
+}
+
+.error {
+  color: var(--danger);
+  font-size: 13px;
+  text-align: center;
+  margin-bottom: 12px;
+}

@@ -1,17 +1,9 @@
+import { useEffect } from 'react'
 import { Routes, Route, Navigate } from 'react-router-dom'
 import { useAuthStore } from './store/authStore'
-
-function LoginPlaceholder() {
-  return <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100vh', color: 'var(--text-secondary)' }}>Login Page (TODO)</div>
-}
-
-function RegisterPlaceholder() {
-  return <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100vh', color: 'var(--text-secondary)' }}>Register Page (TODO)</div>
-}
-
-function MainPlaceholder() {
-  return <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100vh', color: 'var(--text-secondary)' }}>Main Page (TODO)</div>
-}
+import { LoginPage } from './pages/LoginPage'
+import { RegisterPage } from './pages/RegisterPage'
+import { MainPage } from './pages/MainPage'
 
 function AuthGuard({ children }: { children: React.ReactNode }) {
   const accessToken = useAuthStore((s) => s.accessToken)
@@ -20,11 +12,15 @@ function AuthGuard({ children }: { children: React.ReactNode }) {
 }
 
 export function App() {
+  useEffect(() => {
+    useAuthStore.getState().restoreSession()
+  }, [])
+
   return (
     <Routes>
-      <Route path="/login" element={<LoginPlaceholder />} />
-      <Route path="/register" element={<RegisterPlaceholder />} />
-      <Route path="/" element={<AuthGuard><MainPlaceholder /></AuthGuard>} />
+      <Route path="/login" element={<LoginPage />} />
+      <Route path="/register" element={<RegisterPage />} />
+      <Route path="/" element={<AuthGuard><MainPage /></AuthGuard>} />
     </Routes>
   )
 }

@@ -1,0 +1,32 @@
+.reactions {
+  display: flex;
+  gap: 4px;
+  flex-wrap: wrap;
+  margin-top: 4px;
+}
+
+.reaction {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  padding: 2px 6px;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 10px;
+  font-size: 12px;
+  cursor: pointer;
+  border: none;
+  color: var(--text-primary);
+}
+
+.reaction:hover {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.mine {
+  background: rgba(82, 136, 193, 0.3);
+}
+
+.count {
+  font-size: 11px;
+  color: var(--text-secondary);
+}

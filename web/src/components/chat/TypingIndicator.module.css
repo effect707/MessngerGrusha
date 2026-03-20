@@ -1,0 +1,6 @@
+.typing {
+  font-size: 12px;
+  color: var(--text-secondary);
+  padding: 4px 16px;
+  font-style: italic;
+}

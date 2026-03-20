@@ -1,0 +1,50 @@
+.container {
+  padding: 8px 12px;
+  background: var(--bg-secondary);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.attach {
+  background: none;
+  border: none;
+  color: var(--text-secondary);
+  font-size: 20px;
+  cursor: pointer;
+  padding: 4px;
+}
+
+.attach:hover {
+  color: var(--text-primary);
+}
+
+.input {
+  flex: 1;
+  background: var(--bg-input);
+  border: none;
+  border-radius: 18px;
+  padding: 10px 16px;
+  font-size: 13px;
+  color: var(--text-primary);
+  outline: none;
+  resize: none;
+}
+
+.input::placeholder {
+  color: var(--text-secondary);
+}
+
+.send {
+  background: none;
+  border: none;
+  color: var(--accent);
+  font-size: 20px;
+  cursor: pointer;
+  padding: 4px;
+}
+
+.send:disabled {
+  color: var(--text-secondary);
+  cursor: default;
+}

@@ -1,0 +1,62 @@
+.wrapper {
+  display: flex;
+  margin-bottom: 4px;
+}
+
+.incoming {
+  justify-content: flex-start;
+}
+
+.outgoing {
+  justify-content: flex-end;
+}
+
+.bubble {
+  max-width: 65%;
+  padding: 8px 12px;
+  position: relative;
+}
+
+.bubbleIncoming {
+  background: var(--bg-incoming);
+  border-radius: 0 12px 12px 12px;
+}
+
+.bubbleOutgoing {
+  background: var(--bg-active);
+  border-radius: 12px 0 12px 12px;
+}
+
+.content {
+  font-size: 13px;
+  line-height: 1.4;
+  word-break: break-word;
+}
+
+.meta {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 4px;
+  margin-top: 2px;
+}
+
+.time {
+  font-size: 11px;
+  color: var(--text-secondary);
+}
+
+.contextMenu {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  opacity: 0;
+  transition: opacity 0.15s;
+  cursor: pointer;
+  font-size: 14px;
+  padding: 4px;
+}
+
+.wrapper:hover .contextMenu {
+  opacity: 1;
+}

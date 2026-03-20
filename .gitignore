@@ -1,5 +1,6 @@
 # Binaries
 /build/
+/grusha
 *.exe
 *.exe~
 *.dll

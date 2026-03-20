@@ -60,7 +60,8 @@ func (h *ChatHandler) CreateGroupChat(ctx context.Context, req *pb.CreateGroupCh
 
 	memberIDs := make([]uuid.UUID, 0, len(req.GetMemberIds()))
 	for _, idStr := range req.GetMemberIds() {
-		id, err := uuid.Parse(idStr)
+		var id uuid.UUID
+		id, err = uuid.Parse(idStr)
 		if err != nil {
 			return nil, status.Error(codes.InvalidArgument, "invalid member_id: "+idStr)
 		}

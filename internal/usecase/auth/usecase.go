@@ -186,7 +186,7 @@ func (uc *UseCase) RefreshTokens(ctx context.Context, refreshToken string) (*jwt
 		return nil, domain.ErrTokenRevoked
 	}
 
-	if err := uc.tokenRepo.Revoke(ctx, refreshHash); err != nil {
+	if err = uc.tokenRepo.Revoke(ctx, refreshHash); err != nil {
 		return nil, fmt.Errorf("revoke old token: %w", err)
 	}
 

@@ -64,10 +64,7 @@ func extractUserID(ctx context.Context, tokenManager *jwtpkg.TokenManager) (uuid
 		return uuid.UUID{}, status.Error(codes.Unauthenticated, "missing authorization header")
 	}
 
-	token := values[0]
-	if strings.HasPrefix(token, "Bearer ") {
-		token = strings.TrimPrefix(token, "Bearer ")
-	}
+	token := strings.TrimPrefix(values[0], "Bearer ")
 
 	claims, err := tokenManager.ParseToken(token)
 	if err != nil {

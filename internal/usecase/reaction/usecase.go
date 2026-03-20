@@ -85,7 +85,8 @@ func (uc *UseCase) GetReactions(ctx context.Context, messageID, userID uuid.UUID
 	}
 
 	if msg.ChatID != nil {
-		isMember, err := uc.chatRepo.IsMember(ctx, *msg.ChatID, userID)
+		var isMember bool
+		isMember, err = uc.chatRepo.IsMember(ctx, *msg.ChatID, userID)
 		if err != nil {
 			return nil, fmt.Errorf("check membership: %w", err)
 		}

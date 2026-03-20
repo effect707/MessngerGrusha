@@ -56,7 +56,7 @@ func (r *ChatRepository) CreateDirect(ctx context.Context, creatorID, recipientI
 	if err != nil {
 		return nil, fmt.Errorf("begin tx: %w", err)
 	}
-	defer tx.Rollback(ctx)
+	defer func() { _ = tx.Rollback(ctx) }()
 
 	q := r.queries.WithTx(tx)
 
@@ -113,7 +113,7 @@ func (r *ChatRepository) CreateGroup(ctx context.Context, name string, creatorID
 	if err != nil {
 		return nil, fmt.Errorf("begin tx: %w", err)
 	}
-	defer tx.Rollback(ctx)
+	defer func() { _ = tx.Rollback(ctx) }()
 
 	q := r.queries.WithTx(tx)
 

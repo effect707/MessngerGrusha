@@ -46,7 +46,7 @@ func (c *Client) Send(data []byte) {
 func (c *Client) ReadPump(ctx context.Context, handler func(userID uuid.UUID, data []byte)) {
 	defer func() {
 		c.hub.Unregister(c)
-		c.conn.CloseNow()
+		_ = c.conn.CloseNow()
 	}()
 
 	c.conn.SetReadLimit(maxMessageSize)
@@ -73,14 +73,14 @@ func (c *Client) WritePump(ctx context.Context) {
 	ticker := time.NewTicker(pingPeriod)
 	defer func() {
 		ticker.Stop()
-		c.conn.CloseNow()
+		_ = c.conn.CloseNow()
 	}()
 
 	for {
 		select {
 		case message, ok := <-c.send:
 			if !ok {
-				c.conn.Close(websocket.StatusNormalClosure, "")
+				_ = c.conn.Close(websocket.StatusNormalClosure, "")
 				return
 			}
 

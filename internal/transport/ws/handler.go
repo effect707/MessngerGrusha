@@ -158,7 +158,7 @@ func (h *WSHandler) handleTyping(ctx context.Context, client *Client, payload js
 		return
 	}
 
-	if err := h.typingNotifier.SetTyping(ctx, chatID, client.UserID); err != nil {
+	if err = h.typingNotifier.SetTyping(ctx, chatID, client.UserID); err != nil {
 		h.logger.Error("failed to set typing", slog.String("error", err.Error()))
 		return
 	}
@@ -178,7 +178,7 @@ func (h *WSHandler) handleTyping(ctx context.Context, client *Client, payload js
 
 	for _, m := range members {
 		if m.UserID != client.UserID {
-			h.hub.SendToUser(m.UserID, event)
+			_ = h.hub.SendToUser(m.UserID, event)
 		}
 	}
 }

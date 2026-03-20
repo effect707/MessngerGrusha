@@ -48,7 +48,8 @@ func (uc *UseCase) CreateDirectChat(ctx context.Context, creatorID, recipientID 
 
 	existingChatID, err := uc.chatRepo.GetDirectChatID(ctx, creatorID, recipientID)
 	if err == nil {
-		chat, err := uc.chatRepo.GetByID(ctx, existingChatID)
+		var chat *domain.Chat
+		chat, err = uc.chatRepo.GetByID(ctx, existingChatID)
 		if err != nil {
 			return nil, fmt.Errorf("get existing chat: %w", err)
 		}

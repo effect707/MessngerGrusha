@@ -180,7 +180,7 @@ func TestDownload_Success(t *testing.T) {
 
 	require.NoError(t, err)
 	assert.Equal(t, "test.png", attachment.FileName)
-	defer reader.Close()
+	defer func() { _ = reader.Close() }()
 }
 
 func TestDownload_NotMember(t *testing.T) {

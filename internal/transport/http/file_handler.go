@@ -27,7 +27,7 @@ func NewFileHandler(fileUC *fileuc.UseCase, tokenManager *jwtpkg.TokenManager, l
 	}
 }
 
-const maxUploadSize = 50 << 20 
+const maxUploadSize = 50 << 20
 
 func (h *FileHandler) Upload(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
@@ -42,7 +42,7 @@ func (h *FileHandler) Upload(w http.ResponseWriter, r *http.Request) {
 	}
 
 	r.Body = http.MaxBytesReader(w, r.Body, maxUploadSize)
-	if err := r.ParseMultipartForm(maxUploadSize); err != nil {
+	if err = r.ParseMultipartForm(maxUploadSize); err != nil {
 		http.Error(w, "file too large", http.StatusRequestEntityTooLarge)
 		return
 	}
@@ -52,7 +52,7 @@ func (h *FileHandler) Upload(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "missing file", http.StatusBadRequest)
 		return
 	}
-	defer file.Close()
+	defer func() { _ = file.Close() }()
 
 	messageID, err := uuid.Parse(r.FormValue("message_id"))
 	if err != nil {
@@ -67,7 +67,8 @@ func (h *FileHandler) Upload(w http.ResponseWriter, r *http.Request) {
 
 	var durationMs *int
 	if d := r.FormValue("duration_ms"); d != "" {
-		v, err := strconv.Atoi(d)
+		var v int
+		v, err = strconv.Atoi(d)
 		if err == nil {
 			durationMs = &v
 		}
@@ -90,7 +91,7 @@ func (h *FileHandler) Upload(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusCreated)
-	fmt.Fprintf(w, `{"id":"%s","file_name":"%s","file_size":%d,"mime_type":"%s"}`,
+	_, _ = fmt.Fprintf(w, `{"id":"%s","file_name":"%s","file_size":%d,"mime_type":"%s"}`,
 		attachment.ID, attachment.FileName, attachment.FileSize, attachment.MimeType)
 }
 
@@ -118,13 +119,13 @@ func (h *FileHandler) Download(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "download failed", http.StatusInternalServerError)
 		return
 	}
-	defer reader.Close()
+	defer func() { _ = reader.Close() }()
 
 	w.Header().Set("Content-Type", attachment.MimeType)
 	w.Header().Set("Content-Disposition", fmt.Sprintf(`attachment; filename="%s"`, attachment.FileName))
 	w.Header().Set("Content-Length", strconv.FormatInt(attachment.FileSize, 10))
 
-	io.Copy(w, reader)
+	_, _ = io.Copy(w, reader)
 }
 
 func (h *FileHandler) authenticate(r *http.Request) (uuid.UUID, error) {

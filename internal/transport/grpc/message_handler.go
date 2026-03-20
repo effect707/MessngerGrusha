@@ -52,7 +52,8 @@ func (h *MessageHandler) SendMessage(ctx context.Context, req *pb.SendMessageReq
 	}
 
 	if req.ReplyToId != nil {
-		replyID, err := uuid.Parse(*req.ReplyToId)
+		var replyID uuid.UUID
+		replyID, err = uuid.Parse(*req.ReplyToId)
 		if err != nil {
 			return nil, status.Error(codes.InvalidArgument, "invalid reply_to_id")
 		}
@@ -88,7 +89,8 @@ func (h *MessageHandler) GetHistory(ctx context.Context, req *pb.GetHistoryReque
 
 	var cursor *pagination.Cursor
 	if req.CursorId != nil && req.CursorCreatedAt != nil {
-		t, err := time.Parse(time.RFC3339Nano, *req.CursorCreatedAt)
+		var t time.Time
+		t, err = time.Parse(time.RFC3339Nano, *req.CursorCreatedAt)
 		if err != nil {
 			return nil, status.Error(codes.InvalidArgument, "invalid cursor_created_at")
 		}

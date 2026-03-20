@@ -11,9 +11,9 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	"github.com/jackc/pgx/v5/pgxpool"
 	goredis "github.com/redis/go-redis/v9"
-	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 	"google.golang.org/protobuf/encoding/protojson"
@@ -63,7 +63,7 @@ func New(cfg *config.Config) (*App, error) {
 		return nil, fmt.Errorf("connect to postgres: %w", err)
 	}
 
-	if err := pool.Ping(ctx); err != nil {
+	if err = pool.Ping(ctx); err != nil {
 		return nil, fmt.Errorf("ping postgres: %w", err)
 	}
 	logger.Info("connected to PostgreSQL")
@@ -74,7 +74,7 @@ func New(cfg *config.Config) (*App, error) {
 		DB:       cfg.Redis.DB,
 	})
 
-	if err := redisClient.Ping(ctx).Err(); err != nil {
+	if err = redisClient.Ping(ctx).Err(); err != nil {
 		return nil, fmt.Errorf("ping redis: %w", err)
 	}
 	logger.Info("connected to Redis")
@@ -189,7 +189,7 @@ func New(cfg *config.Config) (*App, error) {
 
 	mux.HandleFunc("/health", func(w http.ResponseWriter, _ *http.Request) {
 		w.WriteHeader(http.StatusOK)
-		fmt.Fprint(w, "ok")
+		_, _ = fmt.Fprint(w, "ok")
 	})
 
 	httpServer := &http.Server{

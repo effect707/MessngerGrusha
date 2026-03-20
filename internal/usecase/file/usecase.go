@@ -109,7 +109,8 @@ func (uc *UseCase) Download(ctx context.Context, attachmentID, userID uuid.UUID)
 	}
 
 	if msg.ChatID != nil {
-		isMember, err := uc.chatRepo.IsMember(ctx, *msg.ChatID, userID)
+		var isMember bool
+		isMember, err = uc.chatRepo.IsMember(ctx, *msg.ChatID, userID)
 		if err != nil {
 			return nil, nil, fmt.Errorf("check membership: %w", err)
 		}
@@ -133,7 +134,8 @@ func (uc *UseCase) GetAttachments(ctx context.Context, messageID, userID uuid.UU
 	}
 
 	if msg.ChatID != nil {
-		isMember, err := uc.chatRepo.IsMember(ctx, *msg.ChatID, userID)
+		var isMember bool
+		isMember, err = uc.chatRepo.IsMember(ctx, *msg.ChatID, userID)
 		if err != nil {
 			return nil, fmt.Errorf("check membership: %w", err)
 		}

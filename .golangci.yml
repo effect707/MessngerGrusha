@@ -1,34 +1,37 @@
+version: "2"
+
+formatters:
+  enable:
+    - gofmt
+    - goimports
+
 linters:
   enable:
     - errcheck
     - govet
     - staticcheck
     - unused
-    - gosimple
     - ineffassign
-    - typecheck
-    - gofmt
-    - goimports
     - misspell
     - unconvert
     - goconst
     - prealloc
     - nolintlint
-
-linters-settings:
-  govet:
-    shadow: true
-  goconst:
-    min-len: 3
-    min-occurrences: 3
-  misspell:
-    locale: US
+  settings:
+    govet:
+      enable:
+        - shadow
+    goconst:
+      min-len: 3
+      min-occurrences: 3
+    misspell:
+      locale: US
+  exclusions:
+    presets: []
 
 run:
   timeout: 5m
-  modules-download-mode: readonly
 
 issues:
-  exclude-use-default: false
   max-issues-per-linter: 50
   max-same-issues: 10
